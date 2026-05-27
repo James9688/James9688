@@ -1,0 +1,791 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#080c1d" />
+    <title>周五活动安排人选抽签</title>
+    <style>
+      :root {
+        --night: #070b19;
+        --deep: #0c1430;
+        --panel: rgba(14, 21, 43, 0.73);
+        --panel-strong: rgba(18, 27, 52, 0.9);
+        --line: rgba(222, 186, 110, 0.24);
+        --line-bright: rgba(236, 206, 137, 0.54);
+        --gold: #e8c377;
+        --gold-soft: #f3dfad;
+        --gold-light: #fff0c9;
+        --white: #f7f3e9;
+        --muted: #a8afc4;
+        --green: #b6d6bd;
+        --shadow: 0 34px 100px rgba(0, 0, 0, 0.46);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        min-height: 100%;
+      }
+
+      body {
+        margin: 0;
+        color: var(--white);
+        font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+        background:
+          radial-gradient(circle at 50% 22%, rgba(194, 151, 70, 0.16), transparent 29%),
+          radial-gradient(circle at 18% 72%, rgba(56, 83, 147, 0.19), transparent 32%),
+          radial-gradient(circle at 83% 67%, rgba(105, 75, 116, 0.18), transparent 28%),
+          linear-gradient(128deg, #050812 0%, #0b1127 48%, #070b18 100%);
+        overflow-x: hidden;
+      }
+
+      body::before,
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      body::before {
+        opacity: 0.37;
+        background-image:
+          radial-gradient(circle, rgba(255, 234, 178, 0.52) 1px, transparent 1px),
+          radial-gradient(circle, rgba(255, 255, 255, 0.34) 1px, transparent 1px);
+        background-position: 10% 18%, 83% 13%;
+        background-size: 180px 180px, 260px 260px;
+        mask-image: radial-gradient(ellipse at center, #000 0%, transparent 78%);
+      }
+
+      body::after {
+        background:
+          repeating-linear-gradient(
+            108deg,
+            rgba(255, 255, 255, 0.012) 0 1px,
+            transparent 1px 6px
+          );
+        mix-blend-mode: overlay;
+      }
+
+      #confetti {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 3;
+        pointer-events: none;
+      }
+
+      .page {
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        display: grid;
+        align-items: center;
+        padding: clamp(24px, 4vw, 44px);
+      }
+
+      .frame {
+        width: min(1180px, 100%);
+        min-height: min(760px, calc(100vh - 48px));
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 0.9fr 1fr;
+        border: 1px solid var(--line);
+        border-radius: 30px;
+        overflow: hidden;
+        background:
+          linear-gradient(117deg, rgba(255, 255, 255, 0.033), transparent 34%),
+          rgba(5, 9, 21, 0.5);
+        backdrop-filter: blur(9px);
+        box-shadow: var(--shadow);
+      }
+
+      .intro {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: clamp(34px, 5vw, 60px) clamp(30px, 5vw, 56px);
+        border-right: 1px solid var(--line);
+        background:
+          radial-gradient(circle at 10% 10%, rgba(232, 195, 119, 0.09), transparent 36%),
+          linear-gradient(170deg, rgba(13, 20, 41, 0.72), rgba(8, 13, 29, 0.46));
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--gold);
+        font-size: 12px;
+        letter-spacing: 0.28em;
+        white-space: nowrap;
+      }
+
+      .eyebrow::before {
+        content: "";
+        width: 39px;
+        height: 1px;
+        background: var(--gold);
+      }
+
+      h1 {
+        margin: 40px 0 20px;
+        color: var(--gold-light);
+        font-family: "Songti SC", "STSong", "SimSun", serif;
+        font-size: clamp(46px, 5.2vw, 66px);
+        font-weight: 500;
+        line-height: 1.19;
+        letter-spacing: 0.08em;
+      }
+
+      .intro-copy {
+        max-width: 370px;
+        margin: 0;
+        color: #ccd0db;
+        font-size: 15px;
+        line-height: 2;
+        letter-spacing: 0.04em;
+      }
+
+      .rule {
+        margin-top: clamp(54px, 9vh, 110px);
+        padding: 23px 23px 22px;
+        border: 1px solid rgba(232, 195, 119, 0.17);
+        border-radius: 16px;
+        color: #b6bdcd;
+        background: rgba(255, 255, 255, 0.024);
+        font-size: 13px;
+        line-height: 1.85;
+      }
+
+      .rule-title {
+        display: block;
+        margin-bottom: 7px;
+        color: var(--gold-soft);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+      }
+
+      .draw-room {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: clamp(28px, 4vw, 52px);
+      }
+
+      .draw-room::before {
+        content: "";
+        position: absolute;
+        top: 7%;
+        bottom: 7%;
+        left: 50%;
+        width: min(400px, 80%);
+        transform: translateX(-50%);
+        background: radial-gradient(ellipse, rgba(229, 188, 101, 0.08), transparent 68%);
+        pointer-events: none;
+      }
+
+      .week-label {
+        position: relative;
+        margin-bottom: 30px;
+        color: var(--muted);
+        font-size: 13px;
+        letter-spacing: 0.33em;
+        text-transform: uppercase;
+      }
+
+      .orb {
+        position: relative;
+        width: clamp(270px, 34vw, 342px);
+        aspect-ratio: 1;
+        display: grid;
+        place-items: center;
+        margin-bottom: 34px;
+      }
+
+      .orb-ring,
+      .orb-ring::before,
+      .orb-ring::after {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+      }
+
+      .orb-ring {
+        border: 1px solid rgba(232, 195, 119, 0.2);
+        background:
+          radial-gradient(circle, rgba(232, 195, 119, 0.09), transparent 65%),
+          rgba(255, 255, 255, 0.012);
+        box-shadow:
+          inset 0 0 58px rgba(231, 190, 102, 0.04),
+          0 0 80px rgba(224, 175, 75, 0.05);
+      }
+
+      .orb-ring::before,
+      .orb-ring::after {
+        content: "";
+        inset: -12px;
+        border: 1px solid rgba(232, 195, 119, 0.13);
+      }
+
+      .orb-ring::after {
+        inset: 16px;
+        border-color: rgba(232, 195, 119, 0.16);
+        border-style: dashed;
+        animation: rotate 38s linear infinite;
+      }
+
+      .seal {
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        width: 40px;
+        height: 40px;
+        transform: translateX(-50%) rotate(45deg);
+        border: 1px solid var(--line-bright);
+        background: var(--deep);
+      }
+
+      .seal::after {
+        content: "五";
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        transform: rotate(-45deg);
+        color: var(--gold);
+        font-family: "Songti SC", serif;
+        font-size: 18px;
+      }
+
+      .display {
+        position: relative;
+        z-index: 1;
+        width: calc(100% - 56px);
+        text-align: center;
+      }
+
+      .display-kicker {
+        margin: 0 0 18px;
+        color: var(--muted);
+        font-size: 12px;
+        letter-spacing: 0.23em;
+      }
+
+      .rolling-name {
+        min-height: 72px;
+        margin: 0;
+        color: var(--gold-light);
+        font-family: "Songti SC", "STSong", serif;
+        font-size: clamp(45px, 6vw, 58px);
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-indent: 0.2em;
+        transition: opacity 180ms ease, transform 180ms ease;
+      }
+
+      .rolling-name.waiting {
+        color: rgba(255, 240, 201, 0.6);
+        font-size: clamp(34px, 5vw, 45px);
+      }
+
+      .rolling-name.swap {
+        opacity: 0.2;
+        transform: translateY(4px) scale(0.98);
+      }
+
+      .subline {
+        min-height: 25px;
+        margin: 18px 0 0;
+        color: #aab2c5;
+        font-size: 13px;
+        letter-spacing: 0.08em;
+      }
+
+      .candidate-list {
+        position: relative;
+        display: flex;
+        gap: 12px;
+        margin: 0 0 34px;
+        padding: 0;
+        list-style: none;
+      }
+
+      .candidate {
+        min-width: 82px;
+        padding: 10px 17px;
+        text-align: center;
+        border: 1px solid rgba(232, 195, 119, 0.16);
+        border-radius: 999px;
+        color: #c9cfdc;
+        background: rgba(255, 255, 255, 0.025);
+        font-size: 14px;
+        letter-spacing: 0.12em;
+        transition: all 350ms ease;
+      }
+
+      .candidate.selected {
+        color: var(--gold-light);
+        border-color: rgba(232, 195, 119, 0.65);
+        background: rgba(232, 195, 119, 0.12);
+        box-shadow: 0 0 26px rgba(232, 195, 119, 0.16);
+      }
+
+      .actions {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+      }
+
+      button {
+        font: inherit;
+        cursor: pointer;
+      }
+
+      .draw-button {
+        min-width: 245px;
+        height: 58px;
+        border: 1px solid rgba(247, 218, 150, 0.76);
+        border-radius: 999px;
+        color: #251b0b;
+        background:
+          linear-gradient(108deg, #c6953d 0%, #f2db99 43%, #ce9c45 100%);
+        box-shadow:
+          0 15px 36px rgba(190, 139, 47, 0.22),
+          inset 0 1px rgba(255, 244, 204, 0.9);
+        font-size: 16px;
+        letter-spacing: 0.24em;
+        text-indent: 0.24em;
+        transition: transform 180ms ease, box-shadow 180ms ease, opacity 180ms ease;
+      }
+
+      .draw-button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow:
+          0 20px 44px rgba(190, 139, 47, 0.32),
+          inset 0 1px rgba(255, 244, 204, 0.9);
+      }
+
+      .draw-button:active:not(:disabled) {
+        transform: translateY(1px);
+      }
+
+      .draw-button:disabled {
+        cursor: default;
+        opacity: 0.65;
+      }
+
+      .secondary-button {
+        display: none;
+        border: 0;
+        color: #9ca5ba;
+        background: transparent;
+        font-size: 13px;
+        letter-spacing: 0.13em;
+        padding: 7px 14px;
+      }
+
+      .secondary-button.visible {
+        display: block;
+      }
+
+      .secondary-button:hover {
+        color: var(--gold-soft);
+      }
+
+      .receipt {
+        position: absolute;
+        right: clamp(20px, 4vw, 44px);
+        bottom: clamp(18px, 3vw, 34px);
+        left: clamp(20px, 4vw, 44px);
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        color: #657087;
+        font-size: 11px;
+        letter-spacing: 0.11em;
+      }
+
+      .receipt span:last-child {
+        text-align: right;
+      }
+
+      .is-drawing .orb-ring::after {
+        animation-duration: 3.2s;
+      }
+
+      .is-drawing .orb-ring {
+        box-shadow:
+          inset 0 0 60px rgba(231, 190, 102, 0.14),
+          0 0 88px rgba(224, 175, 75, 0.2);
+      }
+
+      .complete .orb-ring {
+        border-color: rgba(232, 195, 119, 0.52);
+        box-shadow:
+          inset 0 0 68px rgba(231, 190, 102, 0.13),
+          0 0 98px rgba(224, 175, 75, 0.16);
+      }
+
+      .complete .subline {
+        color: var(--green);
+      }
+
+      @keyframes rotate {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (max-width: 840px) {
+        .page {
+          display: block;
+          padding: 16px;
+        }
+
+        .frame {
+          display: block;
+          min-height: calc(100vh - 32px);
+          border-radius: 23px;
+        }
+
+        .intro {
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+          padding: 32px 27px 27px;
+        }
+
+        h1 {
+          margin: 25px 0 15px;
+          font-size: clamp(37px, 12vw, 49px);
+        }
+
+        .intro-copy {
+          line-height: 1.75;
+        }
+
+        .rule {
+          margin-top: 25px;
+        }
+
+        .draw-room {
+          min-height: 600px;
+          padding: 36px 22px 62px;
+        }
+
+        .receipt {
+          bottom: 20px;
+        }
+      }
+
+      @media (max-width: 420px) {
+        .orb {
+          width: 264px;
+        }
+
+        .candidate {
+          min-width: 76px;
+          padding-inline: 12px;
+        }
+
+        .receipt {
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .receipt span:last-child {
+          text-align: center;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 1ms !important;
+          transition-duration: 1ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="confetti" aria-hidden="true"></canvas>
+    <main class="page">
+      <section class="frame" aria-label="周五活动安排人选抽签">
+        <div class="intro">
+          <div>
+            <div class="eyebrow">FRIDAY SECRET HOST</div>
+            <h1>周五活动<br />安排人选抽签</h1>
+            <p class="intro-copy">
+              一位负责人将在此揭晓，为本周五准备活动安排。其余两位在未知内容的情况下参与，共赴一场惊喜。
+            </p>
+          </div>
+          <aside class="rule">
+            <span class="rule-title">抽签规则 / RULES</span>
+            本次采用唯一共用签号，三位候选人机会均等。任何设备打开并揭晓，显示的负责人都一致。
+          </aside>
+        </div>
+
+        <div class="draw-room" id="drawRoom">
+          <div class="week-label">THIS FRIDAY · SECRET ASSIGNMENT</div>
+          <div class="orb" aria-live="polite">
+            <div class="orb-ring"></div>
+            <div class="seal"></div>
+            <div class="display">
+              <p class="display-kicker" id="statusLabel">待抽取的负责人</p>
+              <p class="rolling-name waiting" id="rollingName">未揭晓</p>
+              <p class="subline" id="subline">点击按钮，开启本周安排</p>
+            </div>
+          </div>
+
+          <ul class="candidate-list" aria-label="候选人员">
+            <li class="candidate" data-name="恺苒">恺苒</li>
+            <li class="candidate" data-name="宛静">宛静</li>
+            <li class="candidate" data-name="宝瑾">宝瑾</li>
+          </ul>
+
+          <div class="actions">
+            <button class="draw-button" id="drawButton" type="button">开始抽签</button>
+            <button class="secondary-button" id="resetButton" type="button">重新播放揭晓</button>
+          </div>
+
+          <div class="receipt">
+            <span>共用签号抽取 · 多设备结果一致</span>
+            <span id="record">签号已就绪 · 等待揭晓</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      (() => {
+        const names = ["恺苒", "宛静", "宝瑾"];
+        const sharedDrawId = "7718a4c5eb21e7539ab9df5b1ffb5188";
+        const storageKey = `friday-host-revealed-v2-${sharedDrawId}`;
+        const drawRoom = document.getElementById("drawRoom");
+        const drawButton = document.getElementById("drawButton");
+        const resetButton = document.getElementById("resetButton");
+        const rollingName = document.getElementById("rollingName");
+        const statusLabel = document.getElementById("statusLabel");
+        const subline = document.getElementById("subline");
+        const record = document.getElementById("record");
+        const candidates = Array.from(document.querySelectorAll(".candidate"));
+        const canvas = document.getElementById("confetti");
+        const context = canvas.getContext("2d");
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        let drawing = false;
+        let confettiFrame = 0;
+
+        function randomIndex(length) {
+          const values = new Uint32Array(1);
+          const ceiling = Math.floor(0x100000000 / length) * length;
+          let value;
+
+          do {
+            window.crypto.getRandomValues(values);
+            value = values[0];
+          } while (value >= ceiling);
+
+          return value % length;
+        }
+
+        async function sharedResult() {
+          const data = new TextEncoder().encode(sharedDrawId);
+          const digest = await window.crypto.subtle.digest("SHA-256", data);
+          const value = new DataView(digest).getUint32(0, false);
+          return {
+            name: names[value % names.length],
+            reference: sharedDrawId.slice(0, 8).toUpperCase()
+          };
+        }
+
+        function selectCandidate(name) {
+          candidates.forEach((candidate) => {
+            candidate.classList.toggle("selected", candidate.dataset.name === name);
+          });
+        }
+
+        function presentResult(result, celebrate) {
+          rollingName.classList.remove("waiting", "swap");
+          rollingName.textContent = result.name;
+          statusLabel.textContent = "本周活动策划负责人";
+          subline.textContent = "请由负责人筹备，其余两位保持未知参与状态";
+          record.textContent = `共用签号 ${result.reference} · 结果一致`;
+          selectCandidate(result.name);
+          drawRoom.classList.remove("is-drawing");
+          drawRoom.classList.add("complete");
+          drawButton.textContent = "抽签已完成";
+          drawButton.disabled = true;
+          resetButton.classList.add("visible");
+
+          if (celebrate && !reducedMotion) {
+            launchConfetti();
+          }
+        }
+
+        function saveRevealState() {
+          try {
+            localStorage.setItem(storageKey, "revealed");
+          } catch (error) {
+            // The draw result remains consistent even if local reveal state cannot be stored.
+          }
+        }
+
+        function clearStoredResult() {
+          try {
+            localStorage.removeItem(storageKey);
+          } catch (error) {
+            // The current browser may disable storage for local HTML files.
+          }
+        }
+
+        async function loadStoredResult() {
+          try {
+            if (localStorage.getItem(storageKey) === "revealed") {
+              presentResult(await sharedResult(), false);
+            }
+          } catch (error) {
+            clearStoredResult();
+          }
+        }
+
+        async function finalizeDraw() {
+          const result = await sharedResult();
+          saveRevealState();
+          drawing = false;
+          presentResult(result, true);
+        }
+
+        function startDraw() {
+          if (drawing || drawButton.disabled) return;
+
+          drawing = true;
+          drawButton.disabled = true;
+          drawButton.textContent = "抽取中...";
+          drawRoom.classList.add("is-drawing");
+          rollingName.classList.remove("waiting");
+          statusLabel.textContent = "正在抽取";
+          subline.textContent = "命运的光标正在停驻";
+          record.textContent = "正在生成公平结果";
+
+          if (reducedMotion) {
+            window.setTimeout(finalizeDraw, 260);
+            return;
+          }
+
+          let steps = 0;
+          const maxSteps = 24;
+          let delay = 58;
+
+          function roll() {
+            rollingName.classList.add("swap");
+            window.setTimeout(() => {
+              rollingName.textContent = names[steps % names.length];
+              rollingName.classList.remove("swap");
+              steps += 1;
+              if (steps >= maxSteps) {
+                window.setTimeout(finalizeDraw, 230);
+              } else {
+                delay += Math.round(steps * 2.7);
+                window.setTimeout(roll, delay);
+              }
+            }, 75);
+          }
+
+          roll();
+        }
+
+        function resetDraw() {
+          const confirmed = window.confirm("负责人不会改变，仅重新播放揭晓动画。继续吗？");
+          if (!confirmed) return;
+
+          clearStoredResult();
+          drawRoom.classList.remove("complete", "is-drawing");
+          rollingName.classList.add("waiting");
+          rollingName.textContent = "未揭晓";
+          statusLabel.textContent = "待抽取的负责人";
+          subline.textContent = "点击按钮，开启本周安排";
+          record.textContent = "签号已就绪 · 等待揭晓";
+          candidates.forEach((candidate) => candidate.classList.remove("selected"));
+          drawButton.disabled = false;
+          drawButton.textContent = "开始抽签";
+          resetButton.classList.remove("visible");
+        }
+
+        function resizeCanvas() {
+          const scale = window.devicePixelRatio || 1;
+          canvas.width = window.innerWidth * scale;
+          canvas.height = window.innerHeight * scale;
+          canvas.style.width = `${window.innerWidth}px`;
+          canvas.style.height = `${window.innerHeight}px`;
+          context.setTransform(scale, 0, 0, scale, 0, 0);
+        }
+
+        function launchConfetti() {
+          window.cancelAnimationFrame(confettiFrame);
+          resizeCanvas();
+          const colors = ["#e8c377", "#fff0c9", "#c68d3b", "#e7e4de", "#8793bd"];
+          const pieces = Array.from({ length: 92 }, (_, index) => {
+            const direction = index % 2 === 0 ? -1 : 1;
+            return {
+              x: window.innerWidth / 2 + direction * (16 + Math.random() * 50),
+              y: window.innerHeight * 0.39,
+              vx: direction * (1.8 + Math.random() * 5.6),
+              vy: -(2.5 + Math.random() * 7),
+              gravity: 0.11 + Math.random() * 0.06,
+              rotation: Math.random() * Math.PI,
+              turn: (Math.random() - 0.5) * 0.2,
+              width: 4 + Math.random() * 5,
+              height: 6 + Math.random() * 10,
+              alpha: 1,
+              color: colors[randomIndex(colors.length)]
+            };
+          });
+          let frame = 0;
+
+          function render() {
+            context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            pieces.forEach((piece) => {
+              piece.x += piece.vx;
+              piece.y += piece.vy;
+              piece.vy += piece.gravity;
+              piece.rotation += piece.turn;
+              piece.alpha = Math.max(0, 1 - frame / 125);
+              context.save();
+              context.globalAlpha = piece.alpha;
+              context.translate(piece.x, piece.y);
+              context.rotate(piece.rotation);
+              context.fillStyle = piece.color;
+              context.fillRect(-piece.width / 2, -piece.height / 2, piece.width, piece.height);
+              context.restore();
+            });
+            frame += 1;
+            if (frame < 126) {
+              confettiFrame = window.requestAnimationFrame(render);
+            } else {
+              context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            }
+          }
+
+          render();
+        }
+
+        drawButton.addEventListener("click", startDraw);
+        resetButton.addEventListener("click", resetDraw);
+        window.addEventListener("resize", resizeCanvas);
+        loadStoredResult();
+      })();
+    </script>
+  </body>
+</html>
