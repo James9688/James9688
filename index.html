@@ -1043,17 +1043,17 @@
           <article class="card">
             <div class="section-title">
               <div>
-                <h2>云端升级准备</h2>
-                <p>这里先把结构预留好。接入 Supabase 后，所有人的评分、照片和活动记录会共享。</p>
+                <h2>云端同步</h2>
+                <p>配置 Supabase 后，所有人的活动记录、灵感、评分和小图照片都会同步到同一份数据。</p>
               </div>
-              <span class="status-pill warn">未连接云端</span>
+              <span class="status-pill warn" id="cloudStatus">未配置云端</span>
             </div>
             <ul class="summary-list">
-              <li><span>活动表</span><b>events</b></li>
-              <li><span>评分表</span><b>ratings</b></li>
-              <li><span>照片表</span><b>photos</b></li>
-              <li><span>灵感表</span><b>ideas</b></li>
-              <li><span>图片存储桶</span><b>friday-photos</b></li>
+              <li><span>数据表</span><b>friday_app_state</b></li>
+              <li><span>共享行</span><b>main</b></li>
+              <li><span>同步范围</span><b>活动 / 灵感 / 评分 / 小图</b></li>
+              <li><span>离线兜底</span><b>localStorage</b></li>
+              <li><span>配置文件</span><b>friday_clubhouse_supabase.sql</b></li>
             </ul>
           </article>
           <aside class="card">
@@ -1064,6 +1064,7 @@
               </div>
             </div>
             <div class="actions">
+              <button class="secondary-button" id="refreshButton" type="button">从云端刷新</button>
               <button class="secondary-button" id="exportButton" type="button">导出数据</button>
               <button class="ghost-button" id="clearButton" type="button">清空本地数据</button>
             </div>
@@ -1077,9 +1078,12 @@
     <script>
       (() => {
         const CONFIG = {
-          mode: "local",
-          supabaseUrl: "",
-          supabaseAnonKey: ""
+          mode: "supabase",
+          supabaseUrl: "PASTE_SUPABASE_URL_HERE",
+          supabaseAnonKey: "PASTE_SUPABASE_ANON_KEY_HERE",
+          tableName: "friday_app_state",
+          rowId: "main",
+          syncIntervalMs: 20000
         };
         const people = ["恺苒", "宛静", "宝瑾"];
         const storageKey = "friday-clubhouse-v1";
@@ -1119,6 +1123,8 @@
           ideaAuthorInput: document.getElementById("ideaAuthorInput"),
           ideaDetailInput: document.getElementById("ideaDetailInput"),
           ideaList: document.getElementById("ideaList"),
+          cloudStatus: document.getElementById("cloudStatus"),
+          refreshButton: document.getElementById("refreshButton"),
           exportButton: document.getElementById("exportButton"),
           clearButton: document.getElementById("clearButton"),
           storageInfo: document.getElementById("storageInfo"),
@@ -1130,6 +1136,8 @@
         let activeRating = 5;
         let drawing = false;
         let confettiFrame = 0;
+        let cloudSaveTimer = 0;
+        let isSyncing = false;
 
         function emptyState() {
           return {
@@ -1155,7 +1163,7 @@
             ],
             ideas: [
               {
-                id: cryptoId(),
+                id: "idea-seed-1",
                 title: "周五探店盲盒",
                 author: "宝瑾",
                 detail: "负责人选一家大家没去过但评分不错的店，其他人只知道集合地点。",
@@ -1172,39 +1180,80 @@
             if (!raw) return emptyState();
             const parsed = JSON.parse(raw);
             if (!parsed || !Array.isArray(parsed.events)) return emptyState();
-            const base = emptyState();
-            const mergedEvents = mergeById(base.events, parsed.events);
-            const mergedIdeas = mergeById(base.ideas, Array.isArray(parsed.ideas) ? parsed.ideas : []);
-            return {
-              ...base,
-              ...parsed,
-              events: mergedEvents,
-              ideas: mergedIdeas
-            };
+            return normalizeState(parsed);
           } catch (error) {
             return emptyState();
           }
         }
 
-        function mergeById(seedItems, savedItems) {
+        function normalizeState(input) {
+          const base = emptyState();
+          const parsed = input && typeof input === "object" ? input : {};
+          return {
+            ...base,
+            ...parsed,
+            events: mergeEvents(base.events, Array.isArray(parsed.events) ? parsed.events : []),
+            ideas: mergeByKey(base.ideas, Array.isArray(parsed.ideas) ? parsed.ideas : [], "id")
+          };
+        }
+
+        function mergeAppStates(first, second) {
+          const base = normalizeState(first);
+          const incoming = normalizeState(second);
+          return {
+            ...base,
+            ...incoming,
+            events: mergeEvents(base.events, incoming.events),
+            ideas: mergeByKey(base.ideas, incoming.ideas, "id")
+          };
+        }
+
+        function mergeEvents(seedItems, savedItems) {
           const map = new Map();
           seedItems.forEach((item) => {
             map.set(item.id, item);
           });
           savedItems.forEach((item) => {
             const seed = map.get(item.id) || {};
+            const title = item.title && item.title !== "第一次周五活动" ? item.title : seed.title;
             map.set(item.id, {
               ...seed,
               ...item,
-              title: item.title && item.title !== "第一次周五活动" ? item.title : seed.title
+              weekId: item.weekId || seed.weekId,
+              fridayLabel: item.fridayLabel || seed.fridayLabel,
+              organizer: item.organizer || seed.organizer || "",
+              status: item.status === "done" || seed.status === "done" ? "done" : (item.status || seed.status || "draft"),
+              drawnAt: item.drawnAt || seed.drawnAt || "",
+              title: title || "",
+              time: item.time || seed.time || "",
+              location: item.location || seed.location || "",
+              budget: item.budget || seed.budget || "",
+              plan: item.plan || seed.plan || "",
+              summary: item.summary || seed.summary || "",
+              ratings: mergeByKey(seed.ratings || [], item.ratings || [], "name"),
+              photos: mergeByKey(seed.photos || [], item.photos || [], "id")
             });
           });
           return Array.from(map.values());
         }
 
+        function mergeByKey(seedItems, savedItems, key) {
+          const map = new Map();
+          seedItems.forEach((item) => {
+            map.set(item[key], item);
+          });
+          savedItems.forEach((item) => {
+            if (!item || !item[key]) return;
+            const seed = map.get(item[key]) || {};
+            map.set(item[key], { ...seed, ...item });
+          });
+          return Array.from(map.values());
+        }
+
         function saveState() {
-          localStorage.setItem(storageKey, JSON.stringify(state));
+          persistQuietly();
           render();
+          scheduleCloudSave();
         }
 
         function cryptoId() {
@@ -1265,12 +1314,125 @@
             };
             state.events.unshift(event);
             persistQuietly();
+            scheduleCloudSave();
           }
           return event;
         }
 
         function persistQuietly() {
           localStorage.setItem(storageKey, JSON.stringify(state));
+        }
+
+        function cloudEnabled() {
+          return CONFIG.mode === "supabase" &&
+            CONFIG.supabaseUrl &&
+            CONFIG.supabaseAnonKey &&
+            !CONFIG.supabaseUrl.includes("PASTE_") &&
+            !CONFIG.supabaseAnonKey.includes("PASTE_");
+        }
+
+        function cloudUrl(query = "") {
+          const base = CONFIG.supabaseUrl.replace(/\/$/, "");
+          return `${base}/rest/v1/${CONFIG.tableName}${query}`;
+        }
+
+        function cloudHeaders(extra = {}) {
+          return {
+            apikey: CONFIG.supabaseAnonKey,
+            Authorization: `Bearer ${CONFIG.supabaseAnonKey}`,
+            "Content-Type": "application/json",
+            ...extra
+          };
+        }
+
+        function setCloudStatus(text, kind = "warn") {
+          els.cloudStatus.textContent = text;
+          els.cloudStatus.className = `status-pill ${kind}`;
+        }
+
+        async function initCloud() {
+          if (!cloudEnabled()) {
+            setCloudStatus("未配置云端", "warn");
+            els.refreshButton.disabled = true;
+            return;
+          }
+
+          els.refreshButton.disabled = false;
+          await refreshFromCloud({ silent: false });
+          window.setInterval(() => {
+            if (document.hidden || isSyncing) return;
+            refreshFromCloud({ silent: true });
+          }, CONFIG.syncIntervalMs);
+        }
+
+        async function fetchCloudState() {
+          const response = await fetch(
+            cloudUrl(`?id=eq.${encodeURIComponent(CONFIG.rowId)}&select=data,updated_at`),
+            { headers: cloudHeaders() }
+          );
+          if (!response.ok) {
+            throw new Error(`云端读取失败 ${response.status}`);
+          }
+          const rows = await response.json();
+          return rows[0]?.data || null;
+        }
+
+        async function pushCloudState() {
+          if (!cloudEnabled()) return;
+          const remote = await fetchCloudState().catch(() => null);
+          const merged = remote ? mergeAppStates(remote, state) : normalizeState(state);
+          state = merged;
+          persistQuietly();
+          const response = await fetch(cloudUrl(`?on_conflict=id`), {
+            method: "POST",
+            headers: cloudHeaders({ Prefer: "resolution=merge-duplicates,return=minimal" }),
+            body: JSON.stringify([{
+              id: CONFIG.rowId,
+              data: state,
+              updated_at: new Date().toISOString()
+            }])
+          });
+          if (!response.ok) {
+            throw new Error(`云端保存失败 ${response.status}`);
+          }
+        }
+
+        async function refreshFromCloud({ silent }) {
+          if (!cloudEnabled()) return;
+          isSyncing = true;
+          if (!silent) setCloudStatus("正在同步", "warn");
+          try {
+            const remote = await fetchCloudState();
+            if (remote && Array.isArray(remote.events)) {
+              state = mergeAppStates(remote, state);
+              persistQuietly();
+              render();
+            } else {
+              await pushCloudState();
+            }
+            setCloudStatus("云端已连接", "good");
+            if (!silent) showToast("已同步云端数据");
+          } catch (error) {
+            setCloudStatus("云端异常，本地保存", "warn");
+            if (!silent) showToast(error.message || "云端同步失败");
+          } finally {
+            isSyncing = false;
+          }
+        }
+
+        function scheduleCloudSave() {
+          if (!cloudEnabled()) return;
+          window.clearTimeout(cloudSaveTimer);
+          setCloudStatus("等待同步", "warn");
+          cloudSaveTimer = window.setTimeout(async () => {
+            try {
+              await pushCloudState();
+              setCloudStatus("云端已保存", "good");
+            } catch (error) {
+              setCloudStatus("云端保存失败", "warn");
+              showToast(error.message || "云端保存失败，已保存在本机");
+            }
+          }, 650);
         }
 
         function previousOrganizer(exceptWeekId) {
@@ -1312,7 +1474,7 @@
         }
 
         function renderDraw(event) {
-          els.weekTag.textContent = `${event.fridayLabel} · ${CONFIG.mode === "local" ? "本地版" : "云端版"}`;
+          els.weekTag.textContent = `${event.fridayLabel} · ${cloudEnabled() ? "云端版" : "本地版"}`;
           els.candidateList.innerHTML = people.map((name) => (
             `<li class="candidate ${event.organizer === name ? "selected" : ""}" data-name="${name}">${name}</li>`
           )).join("");
@@ -1455,7 +1617,9 @@
 
         function renderStorageInfo() {
           const bytes = new Blob([JSON.stringify(state)]).size;
-          els.storageInfo.textContent = `当前本地数据约 ${(bytes / 1024).toFixed(1)} KB。照片会明显增加体积，云端版会改用对象存储。`;
+          els.storageInfo.textContent = cloudEnabled()
+            ? `云端同步已配置。本机仍保留约 ${(bytes / 1024).toFixed(1)} KB 缓存，用于离线兜底。`
+            : `当前本地数据约 ${(bytes / 1024).toFixed(1)} KB。填入 Supabase URL 和 anon key 后即可共享。`;
         }
 
         function drawCurrentWeek(force = false) {
@@ -1705,6 +1869,10 @@
             }
           });
 
+          els.refreshButton.addEventListener("click", () => {
+            refreshFromCloud({ silent: false });
+          });
+
           els.exportButton.addEventListener("click", async () => {
             const text = JSON.stringify(state, null, 2);
             try {
@@ -1738,6 +1906,7 @@
 
         bindEvents();
         render();
+        initCloud();
       })();
     </script>
   </body>
