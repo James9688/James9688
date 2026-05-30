@@ -1143,7 +1143,7 @@
                 organizer: "宛静",
                 status: "done",
                 drawnAt: "2026-05-27T10:58:00.000Z",
-                title: "第一次周五活动",
+                title: "客家汇加搓麻将",
                 time: "",
                 location: "",
                 budget: "",
@@ -1188,8 +1188,16 @@
 
         function mergeById(seedItems, savedItems) {
           const map = new Map();
-          [...seedItems, ...savedItems].forEach((item) => {
+          seedItems.forEach((item) => {
             map.set(item.id, item);
+          });
+          savedItems.forEach((item) => {
+            const seed = map.get(item.id) || {};
+            map.set(item.id, {
+              ...seed,
+              ...item,
+              title: item.title && item.title !== "第一次周五活动" ? item.title : seed.title
+            });
           });
           return Array.from(map.values());
         }
