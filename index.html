@@ -1172,15 +1172,26 @@
             if (!raw) return emptyState();
             const parsed = JSON.parse(raw);
             if (!parsed || !Array.isArray(parsed.events)) return emptyState();
+            const base = emptyState();
+            const mergedEvents = mergeById(base.events, parsed.events);
+            const mergedIdeas = mergeById(base.ideas, Array.isArray(parsed.ideas) ? parsed.ideas : []);
             return {
-              ...emptyState(),
+              ...base,
               ...parsed,
-              events: parsed.events,
-              ideas: Array.isArray(parsed.ideas) ? parsed.ideas : []
+              events: mergedEvents,
+              ideas: mergedIdeas
             };
           } catch (error) {
             return emptyState();
           }
+        }
+
+        function mergeById(seedItems, savedItems) {
+          const map = new Map();
+          [...seedItems, ...savedItems].forEach((item) => {
+            map.set(item.id, item);
+          });
+          return Array.from(map.values());
         }
 
         function saveState() {
