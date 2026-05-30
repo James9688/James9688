@@ -4,41 +4,44 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#080c1d" />
-    <title>周五活动安排人选抽签</title>
+    <title>周五活动小馆</title>
     <style>
       :root {
         --night: #070b19;
-        --deep: #0c1430;
-        --panel: rgba(14, 21, 43, 0.73);
-        --panel-strong: rgba(18, 27, 52, 0.9);
-        --line: rgba(222, 186, 110, 0.24);
-        --line-bright: rgba(236, 206, 137, 0.54);
+        --deep: #0b1228;
+        --panel: rgba(13, 20, 42, 0.78);
+        --panel-strong: rgba(18, 27, 52, 0.94);
+        --line: rgba(232, 195, 119, 0.2);
+        --line-strong: rgba(232, 195, 119, 0.48);
         --gold: #e8c377;
-        --gold-soft: #f3dfad;
+        --gold-soft: #f1db9c;
         --gold-light: #fff0c9;
-        --white: #f7f3e9;
+        --white: #f8f3e8;
         --muted: #a8afc4;
         --green: #b6d6bd;
-        --shadow: 0 34px 100px rgba(0, 0, 0, 0.46);
+        --red: #f0aaa2;
+        --blue: #98b8ee;
+        --shadow: 0 34px 100px rgba(0, 0, 0, 0.43);
       }
 
       * {
         box-sizing: border-box;
       }
 
-      html,
-      body {
+      html {
         min-height: 100%;
+        scroll-behavior: smooth;
       }
 
       body {
+        min-height: 100%;
         margin: 0;
         color: var(--white);
         font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
         background:
-          radial-gradient(circle at 50% 22%, rgba(194, 151, 70, 0.16), transparent 29%),
-          radial-gradient(circle at 18% 72%, rgba(56, 83, 147, 0.19), transparent 32%),
-          radial-gradient(circle at 83% 67%, rgba(105, 75, 116, 0.18), transparent 28%),
+          radial-gradient(circle at 50% 12%, rgba(232, 195, 119, 0.13), transparent 29%),
+          radial-gradient(circle at 15% 72%, rgba(70, 95, 165, 0.18), transparent 31%),
+          radial-gradient(circle at 86% 64%, rgba(134, 87, 128, 0.17), transparent 27%),
           linear-gradient(128deg, #050812 0%, #0b1127 48%, #070b18 100%);
         overflow-x: hidden;
       }
@@ -48,73 +51,119 @@
         content: "";
         position: fixed;
         inset: 0;
-        pointer-events: none;
         z-index: 0;
+        pointer-events: none;
       }
 
       body::before {
-        opacity: 0.37;
+        opacity: 0.33;
         background-image:
-          radial-gradient(circle, rgba(255, 234, 178, 0.52) 1px, transparent 1px),
-          radial-gradient(circle, rgba(255, 255, 255, 0.34) 1px, transparent 1px);
-        background-position: 10% 18%, 83% 13%;
+          radial-gradient(circle, rgba(255, 236, 190, 0.55) 1px, transparent 1px),
+          radial-gradient(circle, rgba(255, 255, 255, 0.32) 1px, transparent 1px);
         background-size: 180px 180px, 260px 260px;
-        mask-image: radial-gradient(ellipse at center, #000 0%, transparent 78%);
+        background-position: 12% 16%, 82% 14%;
+        mask-image: radial-gradient(ellipse at center, #000 0%, transparent 80%);
       }
 
       body::after {
-        background:
-          repeating-linear-gradient(
-            108deg,
-            rgba(255, 255, 255, 0.012) 0 1px,
-            transparent 1px 6px
-          );
+        background: repeating-linear-gradient(
+          108deg,
+          rgba(255, 255, 255, 0.014) 0 1px,
+          transparent 1px 6px
+        );
         mix-blend-mode: overlay;
+      }
+
+      button,
+      input,
+      textarea,
+      select {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      input,
+      textarea,
+      select {
+        width: 100%;
+        border: 1px solid rgba(232, 195, 119, 0.2);
+        border-radius: 14px;
+        color: var(--white);
+        background: rgba(255, 255, 255, 0.045);
+        outline: none;
+      }
+
+      input,
+      select {
+        height: 44px;
+        padding: 0 14px;
+      }
+
+      textarea {
+        min-height: 96px;
+        padding: 13px 14px;
+        resize: vertical;
+      }
+
+      input:focus,
+      textarea:focus,
+      select:focus {
+        border-color: rgba(232, 195, 119, 0.56);
+        box-shadow: 0 0 0 3px rgba(232, 195, 119, 0.1);
+      }
+
+      label {
+        display: grid;
+        gap: 8px;
+        color: #c9cfde;
+        font-size: 13px;
+        letter-spacing: 0.04em;
       }
 
       #confetti {
         position: fixed;
         inset: 0;
+        z-index: 5;
         width: 100%;
         height: 100%;
-        z-index: 3;
         pointer-events: none;
       }
 
       .page {
         position: relative;
         z-index: 1;
-        min-height: 100vh;
-        display: grid;
-        align-items: center;
-        padding: clamp(24px, 4vw, 44px);
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 32px 0 48px;
       }
 
-      .frame {
-        width: min(1180px, 100%);
-        min-height: min(760px, calc(100vh - 48px));
-        margin: 0 auto;
+      .hero {
         display: grid;
-        grid-template-columns: 0.9fr 1fr;
+        grid-template-columns: minmax(0, 0.9fr) minmax(340px, 1.1fr);
+        min-height: 620px;
+        overflow: hidden;
         border: 1px solid var(--line);
         border-radius: 30px;
-        overflow: hidden;
         background:
-          linear-gradient(117deg, rgba(255, 255, 255, 0.033), transparent 34%),
-          rgba(5, 9, 21, 0.5);
-        backdrop-filter: blur(9px);
+          linear-gradient(117deg, rgba(255, 255, 255, 0.035), transparent 34%),
+          rgba(5, 9, 21, 0.56);
         box-shadow: var(--shadow);
+        backdrop-filter: blur(10px);
       }
 
       .intro {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        padding: clamp(34px, 5vw, 60px) clamp(30px, 5vw, 56px);
+        gap: 36px;
+        padding: clamp(34px, 5vw, 58px);
         border-right: 1px solid var(--line);
         background:
           radial-gradient(circle at 10% 10%, rgba(232, 195, 119, 0.09), transparent 36%),
-          linear-gradient(170deg, rgba(13, 20, 41, 0.72), rgba(8, 13, 29, 0.46));
+          linear-gradient(170deg, rgba(13, 20, 41, 0.72), rgba(8, 13, 29, 0.48));
       }
 
       .eyebrow {
@@ -124,7 +173,6 @@
         color: var(--gold);
         font-size: 12px;
         letter-spacing: 0.28em;
-        white-space: nowrap;
       }
 
       .eyebrow::before {
@@ -135,36 +183,34 @@
       }
 
       h1 {
-        margin: 40px 0 20px;
+        margin: 34px 0 18px;
         color: var(--gold-light);
         font-family: "Songti SC", "STSong", "SimSun", serif;
-        font-size: clamp(46px, 5.2vw, 66px);
+        font-size: clamp(44px, 5vw, 66px);
         font-weight: 500;
-        line-height: 1.19;
+        line-height: 1.18;
         letter-spacing: 0.08em;
       }
 
       .intro-copy {
-        max-width: 370px;
+        max-width: 420px;
         margin: 0;
-        color: #ccd0db;
+        color: #cbd0dc;
         font-size: 15px;
-        line-height: 2;
-        letter-spacing: 0.04em;
+        line-height: 1.95;
       }
 
-      .rule {
-        margin-top: clamp(54px, 9vh, 110px);
-        padding: 23px 23px 22px;
+      .notice {
+        padding: 20px 22px;
         border: 1px solid rgba(232, 195, 119, 0.17);
-        border-radius: 16px;
-        color: #b6bdcd;
-        background: rgba(255, 255, 255, 0.024);
+        border-radius: 18px;
+        color: #b7bece;
+        background: rgba(255, 255, 255, 0.025);
         font-size: 13px;
-        line-height: 1.85;
+        line-height: 1.8;
       }
 
-      .rule-title {
+      .notice strong {
         display: block;
         margin-bottom: 7px;
         color: var(--gold-soft);
@@ -172,7 +218,33 @@
         letter-spacing: 0.18em;
       }
 
-      .draw-room {
+      .stats-strip {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+
+      .stat-mini {
+        padding: 16px;
+        border: 1px solid rgba(232, 195, 119, 0.14);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.025);
+      }
+
+      .stat-mini b {
+        display: block;
+        color: var(--gold-light);
+        font-family: "Songti SC", serif;
+        font-size: 28px;
+        font-weight: 500;
+      }
+
+      .stat-mini span {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .draw-zone {
         position: relative;
         display: flex;
         flex-direction: column;
@@ -181,34 +253,21 @@
         padding: clamp(28px, 4vw, 52px);
       }
 
-      .draw-room::before {
-        content: "";
-        position: absolute;
-        top: 7%;
-        bottom: 7%;
-        left: 50%;
-        width: min(400px, 80%);
-        transform: translateX(-50%);
-        background: radial-gradient(ellipse, rgba(229, 188, 101, 0.08), transparent 68%);
-        pointer-events: none;
-      }
-
-      .week-label {
-        position: relative;
-        margin-bottom: 30px;
+      .week-tag {
+        margin-bottom: 28px;
         color: var(--muted);
         font-size: 13px;
-        letter-spacing: 0.33em;
-        text-transform: uppercase;
+        letter-spacing: 0.28em;
+        text-align: center;
       }
 
       .orb {
         position: relative;
-        width: clamp(270px, 34vw, 342px);
-        aspect-ratio: 1;
         display: grid;
         place-items: center;
-        margin-bottom: 34px;
+        width: clamp(270px, 34vw, 350px);
+        aspect-ratio: 1;
+        margin-bottom: 30px;
       }
 
       .orb-ring,
@@ -220,13 +279,13 @@
       }
 
       .orb-ring {
-        border: 1px solid rgba(232, 195, 119, 0.2);
+        border: 1px solid rgba(232, 195, 119, 0.22);
         background:
-          radial-gradient(circle, rgba(232, 195, 119, 0.09), transparent 65%),
+          radial-gradient(circle, rgba(232, 195, 119, 0.1), transparent 66%),
           rgba(255, 255, 255, 0.012);
         box-shadow:
-          inset 0 0 58px rgba(231, 190, 102, 0.04),
-          0 0 80px rgba(224, 175, 75, 0.05);
+          inset 0 0 58px rgba(231, 190, 102, 0.05),
+          0 0 88px rgba(224, 175, 75, 0.07);
       }
 
       .orb-ring::before,
@@ -250,7 +309,7 @@
         width: 40px;
         height: 40px;
         transform: translateX(-50%) rotate(45deg);
-        border: 1px solid var(--line-bright);
+        border: 1px solid var(--line-strong);
         background: var(--deep);
       }
 
@@ -269,12 +328,12 @@
       .display {
         position: relative;
         z-index: 1;
-        width: calc(100% - 56px);
+        width: calc(100% - 54px);
         text-align: center;
       }
 
       .display-kicker {
-        margin: 0 0 18px;
+        margin: 0 0 16px;
         color: var(--muted);
         font-size: 12px;
         letter-spacing: 0.23em;
@@ -285,7 +344,7 @@
         margin: 0;
         color: var(--gold-light);
         font-family: "Songti SC", "STSong", serif;
-        font-size: clamp(45px, 6vw, 58px);
+        font-size: clamp(44px, 6vw, 58px);
         font-weight: 600;
         letter-spacing: 0.2em;
         text-indent: 0.2em;
@@ -293,28 +352,29 @@
       }
 
       .rolling-name.waiting {
-        color: rgba(255, 240, 201, 0.6);
-        font-size: clamp(34px, 5vw, 45px);
+        color: rgba(255, 240, 201, 0.62);
+        font-size: clamp(32px, 5vw, 44px);
       }
 
       .rolling-name.swap {
-        opacity: 0.2;
+        opacity: 0.18;
         transform: translateY(4px) scale(0.98);
       }
 
       .subline {
         min-height: 25px;
-        margin: 18px 0 0;
+        margin: 16px 0 0;
         color: #aab2c5;
         font-size: 13px;
-        letter-spacing: 0.08em;
+        line-height: 1.7;
       }
 
       .candidate-list {
-        position: relative;
         display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
         gap: 12px;
-        margin: 0 0 34px;
+        margin: 0 0 28px;
         padding: 0;
         list-style: none;
       }
@@ -340,94 +400,58 @@
       }
 
       .actions {
-        position: relative;
         display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
       }
 
-      button {
-        font: inherit;
-        cursor: pointer;
-      }
-
-      .draw-button {
-        min-width: 245px;
-        height: 58px;
-        border: 1px solid rgba(247, 218, 150, 0.76);
+      .primary-button,
+      .secondary-button,
+      .ghost-button,
+      .tab-button {
         border-radius: 999px;
+        transition: transform 180ms ease, box-shadow 180ms ease, opacity 180ms ease, border-color 180ms ease;
+      }
+
+      .primary-button {
+        min-width: 210px;
+        height: 56px;
+        border: 1px solid rgba(247, 218, 150, 0.76);
         color: #251b0b;
-        background:
-          linear-gradient(108deg, #c6953d 0%, #f2db99 43%, #ce9c45 100%);
+        background: linear-gradient(108deg, #c6953d 0%, #f2db99 43%, #ce9c45 100%);
         box-shadow:
           0 15px 36px rgba(190, 139, 47, 0.22),
           inset 0 1px rgba(255, 244, 204, 0.9);
-        font-size: 16px;
-        letter-spacing: 0.24em;
-        text-indent: 0.24em;
-        transition: transform 180ms ease, box-shadow 180ms ease, opacity 180ms ease;
+        letter-spacing: 0.18em;
       }
 
-      .draw-button:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow:
-          0 20px 44px rgba(190, 139, 47, 0.32),
-          inset 0 1px rgba(255, 244, 204, 0.9);
+      .secondary-button,
+      .ghost-button,
+      .tab-button {
+        min-height: 42px;
+        border: 1px solid rgba(232, 195, 119, 0.18);
+        color: #cbd1df;
+        background: rgba(255, 255, 255, 0.035);
+        padding: 0 17px;
       }
 
-      .draw-button:active:not(:disabled) {
-        transform: translateY(1px);
-      }
-
-      .draw-button:disabled {
-        cursor: default;
-        opacity: 0.65;
-      }
-
-      .secondary-button {
-        display: none;
-        border: 0;
-        color: #9ca5ba;
+      .ghost-button {
+        color: #9fa8bd;
         background: transparent;
-        font-size: 13px;
-        letter-spacing: 0.13em;
-        padding: 7px 14px;
       }
 
-      .secondary-button.visible {
-        display: block;
+      .primary-button:hover:not(:disabled),
+      .secondary-button:hover:not(:disabled),
+      .ghost-button:hover:not(:disabled),
+      .tab-button:hover:not(:disabled) {
+        transform: translateY(-1px);
+        border-color: rgba(232, 195, 119, 0.48);
       }
 
-      .secondary-button:hover {
-        color: var(--gold-soft);
-      }
-
-      .receipt {
-        position: absolute;
-        right: clamp(20px, 4vw, 44px);
-        bottom: clamp(18px, 3vw, 34px);
-        left: clamp(20px, 4vw, 44px);
-        display: flex;
-        justify-content: space-between;
-        gap: 16px;
-        color: #657087;
-        font-size: 11px;
-        letter-spacing: 0.11em;
-      }
-
-      .receipt span:last-child {
-        text-align: right;
-      }
-
-      .is-drawing .orb-ring::after {
-        animation-duration: 3.2s;
-      }
-
-      .is-drawing .orb-ring {
-        box-shadow:
-          inset 0 0 60px rgba(231, 190, 102, 0.14),
-          0 0 88px rgba(224, 175, 75, 0.2);
+      button:disabled {
+        cursor: default;
+        opacity: 0.58;
       }
 
       .complete .orb-ring {
@@ -437,8 +461,277 @@
           0 0 98px rgba(224, 175, 75, 0.16);
       }
 
-      .complete .subline {
+      .is-drawing .orb-ring::after {
+        animation-duration: 3.2s;
+      }
+
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 4;
+        display: flex;
+        gap: 10px;
+        margin: 20px 0;
+        padding: 10px;
+        overflow-x: auto;
+        border: 1px solid rgba(232, 195, 119, 0.13);
+        border-radius: 999px;
+        background: rgba(6, 10, 22, 0.78);
+        backdrop-filter: blur(14px);
+      }
+
+      .tab-button {
+        flex: 0 0 auto;
+        min-height: 39px;
+        font-size: 13px;
+      }
+
+      .tab-button.active {
+        color: #251b0b;
+        border-color: rgba(247, 218, 150, 0.76);
+        background: linear-gradient(108deg, #c6953d 0%, #f2db99 50%, #ce9c45 100%);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+
+      .section {
+        display: none;
+      }
+
+      .section.active {
+        display: block;
+      }
+
+      .card {
+        border: 1px solid rgba(232, 195, 119, 0.16);
+        border-radius: 24px;
+        background:
+          linear-gradient(145deg, rgba(255, 255, 255, 0.04), transparent 40%),
+          rgba(10, 16, 35, 0.72);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.22);
+        padding: clamp(20px, 3vw, 28px);
+      }
+
+      .card + .card,
+      .stack > * + * {
+        margin-top: 16px;
+      }
+
+      .section-title {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 20px;
+      }
+
+      .section-title h2,
+      .section-title h3 {
+        margin: 0;
+        color: var(--gold-light);
+        font-family: "Songti SC", serif;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+      }
+
+      .section-title h2 {
+        font-size: clamp(28px, 4vw, 40px);
+      }
+
+      .section-title h3 {
+        font-size: 24px;
+      }
+
+      .section-title p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        line-height: 1.75;
+        font-size: 14px;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .form-grid .full {
+        grid-column: 1 / -1;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 31px;
+        padding: 0 12px;
+        border: 1px solid rgba(232, 195, 119, 0.18);
+        border-radius: 999px;
+        color: #bcc4d5;
+        background: rgba(255, 255, 255, 0.035);
+        font-size: 12px;
+        white-space: nowrap;
+      }
+
+      .status-pill.good {
         color: var(--green);
+      }
+
+      .status-pill.warn {
+        color: var(--gold-soft);
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .small {
+        font-size: 12px;
+        line-height: 1.7;
+      }
+
+      .summary-list {
+        display: grid;
+        gap: 10px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .summary-list li {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(232, 195, 119, 0.1);
+        color: #cbd1df;
+      }
+
+      .summary-list li:last-child {
+        border-bottom: 0;
+      }
+
+      .history-list,
+      .idea-list,
+      .feedback-list,
+      .gallery {
+        display: grid;
+        gap: 12px;
+      }
+
+      .history-item,
+      .idea-item,
+      .feedback-item {
+        border: 1px solid rgba(232, 195, 119, 0.13);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.025);
+        padding: 16px;
+      }
+
+      .history-head,
+      .feedback-head,
+      .idea-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 8px;
+      }
+
+      .history-head b,
+      .feedback-head b,
+      .idea-head b {
+        color: var(--gold-light);
+      }
+
+      .gallery {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .photo-card {
+        position: relative;
+        overflow: hidden;
+        min-height: 150px;
+        border: 1px solid rgba(232, 195, 119, 0.13);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.035);
+      }
+
+      .photo-card img {
+        display: block;
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+      }
+
+      .photo-card button {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        border: 0;
+        border-radius: 999px;
+        color: var(--white);
+        background: rgba(0, 0, 0, 0.55);
+        padding: 5px 9px;
+        font-size: 12px;
+      }
+
+      .empty-state {
+        border: 1px dashed rgba(232, 195, 119, 0.2);
+        border-radius: 18px;
+        color: #9fa8bd;
+        background: rgba(255, 255, 255, 0.02);
+        padding: 18px;
+        text-align: center;
+        line-height: 1.75;
+      }
+
+      .stars {
+        display: flex;
+        gap: 8px;
+      }
+
+      .star {
+        width: 42px;
+        height: 42px;
+        border: 1px solid rgba(232, 195, 119, 0.22);
+        border-radius: 13px;
+        color: rgba(255, 240, 201, 0.54);
+        background: rgba(255, 255, 255, 0.035);
+        font-size: 24px;
+        line-height: 1;
+      }
+
+      .star.active {
+        color: #251b0b;
+        border-color: rgba(247, 218, 150, 0.76);
+        background: linear-gradient(108deg, #c6953d 0%, #f2db99 52%, #ce9c45 100%);
+      }
+
+      .toast {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        z-index: 8;
+        max-width: min(360px, calc(100% - 40px));
+        border: 1px solid rgba(232, 195, 119, 0.28);
+        border-radius: 16px;
+        color: var(--white);
+        background: rgba(8, 13, 29, 0.92);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.36);
+        padding: 13px 16px;
+        opacity: 0;
+        transform: translateY(12px);
+        transition: opacity 180ms ease, transform 180ms ease;
+        pointer-events: none;
+      }
+
+      .toast.visible {
+        opacity: 1;
+        transform: translateY(0);
       }
 
       @keyframes rotate {
@@ -447,65 +740,80 @@
         }
       }
 
-      @media (max-width: 840px) {
+      @media (max-width: 900px) {
         .page {
-          display: block;
-          padding: 16px;
+          width: min(100% - 24px, 720px);
+          padding-top: 18px;
         }
 
-        .frame {
-          display: block;
-          min-height: calc(100vh - 32px);
-          border-radius: 23px;
+        .hero,
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .hero {
+          min-height: 0;
+          border-radius: 24px;
         }
 
         .intro {
           border-right: 0;
           border-bottom: 1px solid var(--line);
-          padding: 32px 27px 27px;
         }
 
-        h1 {
-          margin: 25px 0 15px;
-          font-size: clamp(37px, 12vw, 49px);
+        .draw-zone {
+          min-height: 590px;
         }
 
-        .intro-copy {
-          line-height: 1.75;
+        .stats-strip {
+          grid-template-columns: 1fr;
         }
 
-        .rule {
-          margin-top: 25px;
-        }
-
-        .draw-room {
-          min-height: 600px;
-          padding: 36px 22px 62px;
-        }
-
-        .receipt {
-          bottom: 20px;
+        .gallery {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
         }
       }
 
-      @media (max-width: 420px) {
+      @media (max-width: 540px) {
+        .page {
+          width: calc(100% - 18px);
+        }
+
+        .intro,
+        .draw-zone,
+        .card {
+          padding: 22px;
+        }
+
+        h1 {
+          margin-top: 26px;
+          font-size: 42px;
+        }
+
         .orb {
-          width: 264px;
+          width: min(270px, 82vw);
         }
 
-        .candidate {
-          min-width: 76px;
-          padding-inline: 12px;
-        }
-
-        .receipt {
+        .actions,
+        .section-title,
+        .history-head,
+        .feedback-head,
+        .idea-head {
           flex-direction: column;
-          align-items: center;
-          gap: 8px;
+          align-items: stretch;
         }
 
-        .receipt span:last-child {
-          text-align: center;
+        .primary-button {
+          width: 100%;
+        }
+
+        .form-grid,
+        .gallery {
+          grid-template-columns: 1fr;
+        }
+
+        .nav {
+          border-radius: 20px;
         }
       }
 
@@ -522,225 +830,675 @@
   <body>
     <canvas id="confetti" aria-hidden="true"></canvas>
     <main class="page">
-      <section class="frame" aria-label="周五活动安排人选抽签">
+      <section class="hero" aria-label="周五活动小馆">
         <div class="intro">
           <div>
-            <div class="eyebrow">FRIDAY SECRET HOST</div>
-            <h1>周五活动<br />安排人选抽签</h1>
+            <div class="eyebrow">FRIDAY CLUB HOUSE</div>
+            <h1>周五活动<br />小馆</h1>
             <p class="intro-copy">
-              一位负责人将在此揭晓，为本周五准备活动安排。其余两位在未知内容的情况下参与，共赴一场惊喜。
+              每周抽一位负责人，记录一次活动，留下大家的评分、建议和照片。先从轻量本地版开始，后续接入云端后就会成为朋友们共同维护的小工具。
             </p>
           </div>
-          <aside class="rule">
-            <span class="rule-title">抽签规则 / RULES</span>
-            本次采用唯一共用签号，三位候选人机会均等。任何设备打开并揭晓，显示的负责人都一致。
-          </aside>
+          <div class="stack">
+            <div class="notice">
+              <strong>当前版本 / LOCAL FIRST</strong>
+              抽签、活动内容、照片和评分会保存在当前浏览器。页面已预留云端数据接口，配置好 Supabase 后即可升级为多人实时共享。
+            </div>
+            <div class="stats-strip" id="heroStats"></div>
+          </div>
         </div>
 
-        <div class="draw-room" id="drawRoom">
-          <div class="week-label">THIS FRIDAY · SECRET ASSIGNMENT</div>
+        <div class="draw-zone" id="drawZone">
+          <div class="week-tag" id="weekTag">THIS FRIDAY · LOADING</div>
           <div class="orb" aria-live="polite">
             <div class="orb-ring"></div>
             <div class="seal"></div>
             <div class="display">
-              <p class="display-kicker" id="statusLabel">待抽取的负责人</p>
-              <p class="rolling-name waiting" id="rollingName">未揭晓</p>
-              <p class="subline" id="subline">点击按钮，开启本周安排</p>
+              <p class="display-kicker" id="statusLabel">本周负责人</p>
+              <p class="rolling-name waiting" id="rollingName">待抽取</p>
+              <p class="subline" id="subline">本周新签已准备好</p>
             </div>
           </div>
-
-          <ul class="candidate-list" aria-label="候选人员">
-            <li class="candidate" data-name="恺苒">恺苒</li>
-            <li class="candidate" data-name="宛静">宛静</li>
-            <li class="candidate" data-name="宝瑾">宝瑾</li>
-          </ul>
-
+          <ul class="candidate-list" id="candidateList" aria-label="候选人员"></ul>
           <div class="actions">
-            <button class="draw-button" id="drawButton" type="button">开始抽签</button>
-            <button class="secondary-button" id="resetButton" type="button">重新播放揭晓</button>
-          </div>
-
-          <div class="receipt">
-            <span>共用签号抽取 · 多设备结果一致</span>
-            <span id="record">签号已就绪 · 等待揭晓</span>
+            <button class="primary-button" id="drawButton" type="button">开始本周抽签</button>
+            <button class="secondary-button" id="rerollButton" type="button">补抽本周</button>
           </div>
         </div>
       </section>
+
+      <nav class="nav" aria-label="功能导航">
+        <button class="tab-button active" type="button" data-tab="activity">本周活动</button>
+        <button class="tab-button" type="button" data-tab="rating">评分建议</button>
+        <button class="tab-button" type="button" data-tab="history">历史回顾</button>
+        <button class="tab-button" type="button" data-tab="ideas">灵感池</button>
+        <button class="tab-button" type="button" data-tab="settings">云端准备</button>
+      </nav>
+
+      <section class="section active" id="activity">
+        <div class="grid">
+          <article class="card">
+            <div class="section-title">
+              <div>
+                <h2>活动档案</h2>
+                <p>负责人可以先写安排，活动结束后补充总结。</p>
+              </div>
+              <span class="status-pill" id="activityStatus">未抽取</span>
+            </div>
+            <form class="form-grid" id="activityForm">
+              <label>
+                活动主题
+                <input id="titleInput" maxlength="40" placeholder="例如：桌游夜 / 探店 / 密室" />
+              </label>
+              <label>
+                活动时间
+                <input id="timeInput" maxlength="40" placeholder="例如：周五 19:30" />
+              </label>
+              <label>
+                地点
+                <input id="locationInput" maxlength="60" placeholder="集合地点或店名" />
+              </label>
+              <label>
+                预算
+                <input id="budgetInput" maxlength="40" placeholder="例如：人均 100 元" />
+              </label>
+              <label class="full">
+                活动安排
+                <textarea id="planInput" maxlength="500" placeholder="写下活动流程、需要准备的东西、参与方式。"></textarea>
+              </label>
+              <label class="full">
+                活动总结
+                <textarea id="summaryInput" maxlength="500" placeholder="活动结束后记录好玩的瞬间、下次可优化的地方。"></textarea>
+              </label>
+              <div class="actions full">
+                <button class="primary-button" type="submit">保存活动档案</button>
+                <button class="ghost-button" id="completeButton" type="button">标记已完成</button>
+              </div>
+            </form>
+          </article>
+
+          <aside class="card">
+            <div class="section-title">
+              <div>
+                <h3>本周摘要</h3>
+                <p>适合发到群里的简短状态。</p>
+              </div>
+            </div>
+            <ul class="summary-list" id="summaryList"></ul>
+          </aside>
+        </div>
+
+        <article class="card">
+          <div class="section-title">
+            <div>
+              <h3>活动照片</h3>
+              <p>当前照片保存在本机浏览器。云端版上线后，会改成大家都能看到的共享相册。</p>
+            </div>
+            <span class="status-pill warn">单张建议小于 700KB</span>
+          </div>
+          <div class="actions">
+            <label class="secondary-button" style="display:inline-flex;align-items:center;justify-content:center;">
+              上传照片
+              <input id="photoInput" type="file" accept="image/*" multiple hidden />
+            </label>
+          </div>
+          <div class="gallery" id="gallery"></div>
+        </article>
+      </section>
+
+      <section class="section" id="rating">
+        <div class="grid">
+          <article class="card">
+            <div class="section-title">
+              <div>
+                <h2>评分与建议</h2>
+                <p>每个人选择自己的名字，给本次活动留一个评分和一句建议。</p>
+              </div>
+              <span class="status-pill good" id="ratingAverage">暂无评分</span>
+            </div>
+            <form class="form-grid" id="ratingForm">
+              <label>
+                我是谁
+                <select id="raterInput"></select>
+              </label>
+              <label>
+                本次评分
+                <div class="stars" id="starInput" aria-label="评分"></div>
+              </label>
+              <label class="full">
+                建议或夸奖
+                <textarea id="commentInput" maxlength="220" placeholder="写一句最真实的反馈。"></textarea>
+              </label>
+              <div class="actions full">
+                <button class="primary-button" type="submit">提交评分</button>
+              </div>
+            </form>
+          </article>
+          <aside class="card">
+            <div class="section-title">
+              <div>
+                <h3>大家的反馈</h3>
+                <p>同一人再次提交会覆盖自己之前的评分。</p>
+              </div>
+            </div>
+            <div class="feedback-list" id="feedbackList"></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section" id="history">
+        <article class="card">
+          <div class="section-title">
+            <div>
+              <h2>历史回顾</h2>
+              <p>每一期都会成为一张活动卡片，方便之后回看。</p>
+            </div>
+            <button class="secondary-button" id="newWeekButton" type="button">模拟开启下一周</button>
+          </div>
+          <div class="history-list" id="historyList"></div>
+        </article>
+      </section>
+
+      <section class="section" id="ideas">
+        <div class="grid">
+          <article class="card">
+            <div class="section-title">
+              <div>
+                <h2>活动灵感池</h2>
+                <p>平时想到什么就扔进来，负责人可以直接挑。</p>
+              </div>
+            </div>
+            <form class="form-grid" id="ideaForm">
+              <label>
+                想法标题
+                <input id="ideaTitleInput" maxlength="40" placeholder="例如：冬阴功火锅局" />
+              </label>
+              <label>
+                提议人
+                <select id="ideaAuthorInput"></select>
+              </label>
+              <label class="full">
+                补充说明
+                <textarea id="ideaDetailInput" maxlength="240" placeholder="地点、玩法、预算、适合什么天气都可以写。"></textarea>
+              </label>
+              <div class="actions full">
+                <button class="primary-button" type="submit">加入灵感池</button>
+              </div>
+            </form>
+          </article>
+          <aside class="card">
+            <div class="section-title">
+              <div>
+                <h3>待选灵感</h3>
+                <p>标记采用后会进入已采用状态。</p>
+              </div>
+            </div>
+            <div class="idea-list" id="ideaList"></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section" id="settings">
+        <div class="grid">
+          <article class="card">
+            <div class="section-title">
+              <div>
+                <h2>云端升级准备</h2>
+                <p>这里先把结构预留好。接入 Supabase 后，所有人的评分、照片和活动记录会共享。</p>
+              </div>
+              <span class="status-pill warn">未连接云端</span>
+            </div>
+            <ul class="summary-list">
+              <li><span>活动表</span><b>events</b></li>
+              <li><span>评分表</span><b>ratings</b></li>
+              <li><span>照片表</span><b>photos</b></li>
+              <li><span>灵感表</span><b>ideas</b></li>
+              <li><span>图片存储桶</span><b>friday-photos</b></li>
+            </ul>
+          </article>
+          <aside class="card">
+            <div class="section-title">
+              <div>
+                <h3>管理工具</h3>
+                <p>本地版用于测试流程；清空会删除当前浏览器里的记录。</p>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="secondary-button" id="exportButton" type="button">导出数据</button>
+              <button class="ghost-button" id="clearButton" type="button">清空本地数据</button>
+            </div>
+            <p class="small muted" id="storageInfo"></p>
+          </aside>
+        </div>
+      </section>
     </main>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
     <script>
       (() => {
-        const names = ["恺苒", "宛静", "宝瑾"];
-        const sharedDrawId = "7718a4c5eb21e7539ab9df5b1ffb5188";
-        const storageKey = `friday-host-revealed-v2-${sharedDrawId}`;
-        const drawRoom = document.getElementById("drawRoom");
-        const drawButton = document.getElementById("drawButton");
-        const resetButton = document.getElementById("resetButton");
-        const rollingName = document.getElementById("rollingName");
-        const statusLabel = document.getElementById("statusLabel");
-        const subline = document.getElementById("subline");
-        const record = document.getElementById("record");
-        const candidates = Array.from(document.querySelectorAll(".candidate"));
-        const canvas = document.getElementById("confetti");
-        const context = canvas.getContext("2d");
+        const CONFIG = {
+          mode: "local",
+          supabaseUrl: "",
+          supabaseAnonKey: ""
+        };
+        const people = ["恺苒", "宛静", "宝瑾"];
+        const storageKey = "friday-clubhouse-v1";
         const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const els = {
+          drawZone: document.getElementById("drawZone"),
+          weekTag: document.getElementById("weekTag"),
+          statusLabel: document.getElementById("statusLabel"),
+          rollingName: document.getElementById("rollingName"),
+          subline: document.getElementById("subline"),
+          candidateList: document.getElementById("candidateList"),
+          drawButton: document.getElementById("drawButton"),
+          rerollButton: document.getElementById("rerollButton"),
+          heroStats: document.getElementById("heroStats"),
+          activityStatus: document.getElementById("activityStatus"),
+          activityForm: document.getElementById("activityForm"),
+          titleInput: document.getElementById("titleInput"),
+          timeInput: document.getElementById("timeInput"),
+          locationInput: document.getElementById("locationInput"),
+          budgetInput: document.getElementById("budgetInput"),
+          planInput: document.getElementById("planInput"),
+          summaryInput: document.getElementById("summaryInput"),
+          completeButton: document.getElementById("completeButton"),
+          summaryList: document.getElementById("summaryList"),
+          photoInput: document.getElementById("photoInput"),
+          gallery: document.getElementById("gallery"),
+          ratingAverage: document.getElementById("ratingAverage"),
+          ratingForm: document.getElementById("ratingForm"),
+          raterInput: document.getElementById("raterInput"),
+          starInput: document.getElementById("starInput"),
+          commentInput: document.getElementById("commentInput"),
+          feedbackList: document.getElementById("feedbackList"),
+          historyList: document.getElementById("historyList"),
+          newWeekButton: document.getElementById("newWeekButton"),
+          ideaForm: document.getElementById("ideaForm"),
+          ideaTitleInput: document.getElementById("ideaTitleInput"),
+          ideaAuthorInput: document.getElementById("ideaAuthorInput"),
+          ideaDetailInput: document.getElementById("ideaDetailInput"),
+          ideaList: document.getElementById("ideaList"),
+          exportButton: document.getElementById("exportButton"),
+          clearButton: document.getElementById("clearButton"),
+          storageInfo: document.getElementById("storageInfo"),
+          toast: document.getElementById("toast"),
+          canvas: document.getElementById("confetti")
+        };
+        const context = els.canvas.getContext("2d");
+        let state = loadState();
+        let activeRating = 5;
         let drawing = false;
         let confettiFrame = 0;
+
+        function emptyState() {
+          return {
+            version: 1,
+            weekOffset: 0,
+            events: [
+              {
+                id: "2026-05-29",
+                weekId: "2026-05-29",
+                fridayLabel: "2026年5月29日 周五",
+                organizer: "宛静",
+                status: "done",
+                drawnAt: "2026-05-27T10:58:00.000Z",
+                title: "第一次周五活动",
+                time: "",
+                location: "",
+                budget: "",
+                plan: "这是旧版抽签保存下来的第一次结果，后续可以补充活动安排和照片。",
+                summary: "",
+                ratings: [],
+                photos: []
+              }
+            ],
+            ideas: [
+              {
+                id: cryptoId(),
+                title: "周五探店盲盒",
+                author: "宝瑾",
+                detail: "负责人选一家大家没去过但评分不错的店，其他人只知道集合地点。",
+                used: false,
+                createdAt: new Date().toISOString()
+              }
+            ]
+          };
+        }
+
+        function loadState() {
+          try {
+            const raw = localStorage.getItem(storageKey);
+            if (!raw) return emptyState();
+            const parsed = JSON.parse(raw);
+            if (!parsed || !Array.isArray(parsed.events)) return emptyState();
+            return {
+              ...emptyState(),
+              ...parsed,
+              events: parsed.events,
+              ideas: Array.isArray(parsed.ideas) ? parsed.ideas : []
+            };
+          } catch (error) {
+            return emptyState();
+          }
+        }
+
+        function saveState() {
+          localStorage.setItem(storageKey, JSON.stringify(state));
+          render();
+        }
+
+        function cryptoId() {
+          const bytes = new Uint8Array(8);
+          window.crypto.getRandomValues(bytes);
+          return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+        }
 
         function randomIndex(length) {
           const values = new Uint32Array(1);
           const ceiling = Math.floor(0x100000000 / length) * length;
           let value;
-
           do {
             window.crypto.getRandomValues(values);
             value = values[0];
           } while (value >= ceiling);
-
           return value % length;
         }
 
-        async function sharedResult() {
-          const data = new TextEncoder().encode(sharedDrawId);
-          const digest = await window.crypto.subtle.digest("SHA-256", data);
-          const value = new DataView(digest).getUint32(0, false);
-          return {
-            name: names[value % names.length],
-            reference: sharedDrawId.slice(0, 8).toUpperCase()
-          };
+        function fridayFor(date, offset = 0) {
+          const target = new Date(date);
+          target.setHours(12, 0, 0, 0);
+          const day = target.getDay();
+          const diff = (5 - day + 7) % 7;
+          target.setDate(target.getDate() + diff + offset * 7);
+          return target;
         }
 
-        function selectCandidate(name) {
-          candidates.forEach((candidate) => {
-            candidate.classList.toggle("selected", candidate.dataset.name === name);
-          });
+        function formatDate(date) {
+          return new Intl.DateTimeFormat("zh-CN", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            weekday: "short"
+          }).format(date);
         }
 
-        function presentResult(result, celebrate) {
-          rollingName.classList.remove("waiting", "swap");
-          rollingName.textContent = result.name;
-          statusLabel.textContent = "本周活动策划负责人";
-          subline.textContent = "请由负责人筹备，其余两位保持未知参与状态";
-          record.textContent = `共用签号 ${result.reference} · 结果一致`;
-          selectCandidate(result.name);
-          drawRoom.classList.remove("is-drawing");
-          drawRoom.classList.add("complete");
-          drawButton.textContent = "抽签已完成";
-          drawButton.disabled = true;
-          resetButton.classList.add("visible");
-
-          if (celebrate && !reducedMotion) {
-            launchConfetti();
+        function currentWeek() {
+          const friday = fridayFor(new Date(), state.weekOffset || 0);
+          const weekId = friday.toISOString().slice(0, 10);
+          let event = state.events.find((item) => item.weekId === weekId);
+          if (!event) {
+            event = {
+              id: weekId,
+              weekId,
+              fridayLabel: formatDate(friday),
+              organizer: "",
+              status: "draft",
+              drawnAt: "",
+              title: "",
+              time: "",
+              location: "",
+              budget: "",
+              plan: "",
+              summary: "",
+              ratings: [],
+              photos: []
+            };
+            state.events.unshift(event);
+            persistQuietly();
           }
+          return event;
         }
 
-        function saveRevealState() {
-          try {
-            localStorage.setItem(storageKey, "revealed");
-          } catch (error) {
-            // The draw result remains consistent even if local reveal state cannot be stored.
-          }
+        function persistQuietly() {
+          localStorage.setItem(storageKey, JSON.stringify(state));
         }
 
-        function clearStoredResult() {
-          try {
-            localStorage.removeItem(storageKey);
-          } catch (error) {
-            // The current browser may disable storage for local HTML files.
-          }
+        function previousOrganizer(exceptWeekId) {
+          return state.events
+            .filter((event) => event.weekId !== exceptWeekId && event.organizer)
+            .sort((a, b) => b.weekId.localeCompare(a.weekId))[0]?.organizer;
         }
 
-        async function loadStoredResult() {
-          try {
-            if (localStorage.getItem(storageKey) === "revealed") {
-              presentResult(await sharedResult(), false);
-            }
-          } catch (error) {
-            clearStoredResult();
-          }
+        function chooseOrganizer(event) {
+          const last = previousOrganizer(event.weekId);
+          const pool = people.length > 1 ? people.filter((name) => name !== last) : people;
+          return pool[randomIndex(pool.length)];
         }
 
-        async function finalizeDraw() {
-          const result = await sharedResult();
-          saveRevealState();
-          drawing = false;
-          presentResult(result, true);
+        function averageRating(event) {
+          if (!event.ratings?.length) return 0;
+          const total = event.ratings.reduce((sum, rating) => sum + Number(rating.score || 0), 0);
+          return total / event.ratings.length;
         }
 
-        function startDraw() {
-          if (drawing || drawButton.disabled) return;
+        function showToast(message) {
+          els.toast.textContent = message;
+          els.toast.classList.add("visible");
+          window.clearTimeout(showToast.timer);
+          showToast.timer = window.setTimeout(() => els.toast.classList.remove("visible"), 2200);
+        }
 
-          drawing = true;
-          drawButton.disabled = true;
-          drawButton.textContent = "抽取中...";
-          drawRoom.classList.add("is-drawing");
-          rollingName.classList.remove("waiting");
-          statusLabel.textContent = "正在抽取";
-          subline.textContent = "命运的光标正在停驻";
-          record.textContent = "正在生成公平结果";
+        function render() {
+          const event = currentWeek();
+          renderDraw(event);
+          renderForms(event);
+          renderSummary(event);
+          renderGallery(event);
+          renderRatings(event);
+          renderHistory();
+          renderIdeas();
+          renderStats();
+          renderStorageInfo();
+        }
 
-          if (reducedMotion) {
-            window.setTimeout(finalizeDraw, 260);
+        function renderDraw(event) {
+          els.weekTag.textContent = `${event.fridayLabel} · ${CONFIG.mode === "local" ? "本地版" : "云端版"}`;
+          els.candidateList.innerHTML = people.map((name) => (
+            `<li class="candidate ${event.organizer === name ? "selected" : ""}" data-name="${name}">${name}</li>`
+          )).join("");
+          els.drawZone.classList.toggle("complete", Boolean(event.organizer));
+          els.drawZone.classList.remove("is-drawing");
+          els.rollingName.classList.toggle("waiting", !event.organizer);
+          els.rollingName.textContent = event.organizer || "待抽取";
+          els.statusLabel.textContent = event.organizer ? "本周活动策划负责人" : "本周负责人";
+          els.subline.textContent = event.organizer
+            ? "结果已锁定，可以开始填写活动安排"
+            : "点击按钮，为本周生成新的负责人";
+          els.drawButton.disabled = Boolean(event.organizer);
+          els.drawButton.textContent = event.organizer ? "本周已抽取" : "开始本周抽签";
+          els.rerollButton.disabled = !event.organizer;
+        }
+
+        function renderForms(event) {
+          els.activityStatus.textContent = event.organizer
+            ? `${event.organizer} 负责 · ${event.status === "done" ? "已完成" : "筹备中"}`
+            : "等待抽签";
+          els.activityStatus.className = `status-pill ${event.organizer ? "good" : "warn"}`;
+          els.titleInput.value = event.title || "";
+          els.timeInput.value = event.time || "";
+          els.locationInput.value = event.location || "";
+          els.budgetInput.value = event.budget || "";
+          els.planInput.value = event.plan || "";
+          els.summaryInput.value = event.summary || "";
+          const options = people.map((name) => `<option value="${name}">${name}</option>`).join("");
+          els.raterInput.innerHTML = options;
+          els.ideaAuthorInput.innerHTML = options;
+        }
+
+        function renderSummary(event) {
+          const avg = averageRating(event);
+          const rows = [
+            ["本周负责人", event.organizer || "尚未抽取"],
+            ["活动主题", event.title || "待填写"],
+            ["时间地点", [event.time, event.location].filter(Boolean).join(" · ") || "待填写"],
+            ["照片数量", `${event.photos?.length || 0} 张`],
+            ["平均评分", avg ? `${avg.toFixed(1)} / 5` : "暂无评分"]
+          ];
+          els.summaryList.innerHTML = rows.map(([label, value]) => (
+            `<li><span>${label}</span><b>${escapeHtml(value)}</b></li>`
+          )).join("");
+        }
+
+        function renderGallery(event) {
+          if (!event.photos?.length) {
+            els.gallery.innerHTML = `<div class="empty-state">还没有照片。活动结束后可以先上传到本机预览，云端版会变成共享相册。</div>`;
             return;
           }
+          els.gallery.innerHTML = event.photos.map((photo) => `
+            <div class="photo-card">
+              <img src="${photo.dataUrl}" alt="${escapeHtml(photo.name || "活动照片")}" />
+              <button type="button" data-delete-photo="${photo.id}">删除</button>
+            </div>
+          `).join("");
+        }
 
+        function renderRatings(event) {
+          const avg = averageRating(event);
+          els.ratingAverage.textContent = avg ? `平均 ${avg.toFixed(1)} / 5` : "暂无评分";
+          renderStars(activeRating);
+          if (!event.ratings?.length) {
+            els.feedbackList.innerHTML = `<div class="empty-state">还没有反馈。活动结束后每个人可以留一条。</div>`;
+            return;
+          }
+          els.feedbackList.innerHTML = event.ratings.map((rating) => `
+            <div class="feedback-item">
+              <div class="feedback-head">
+                <b>${escapeHtml(rating.name)}</b>
+                <span class="status-pill">${"★".repeat(rating.score)}${"☆".repeat(5 - rating.score)}</span>
+              </div>
+              <div class="muted small">${escapeHtml(rating.comment || "没有写建议")}</div>
+            </div>
+          `).join("");
+        }
+
+        function renderStars(value) {
+          els.starInput.innerHTML = Array.from({ length: 5 }, (_, index) => {
+            const score = index + 1;
+            return `<button class="star ${score <= value ? "active" : ""}" type="button" data-score="${score}" aria-label="${score} 星">★</button>`;
+          }).join("");
+        }
+
+        function renderHistory() {
+          const sorted = [...state.events].sort((a, b) => b.weekId.localeCompare(a.weekId));
+          if (!sorted.length) {
+            els.historyList.innerHTML = `<div class="empty-state">暂无历史记录。</div>`;
+            return;
+          }
+          els.historyList.innerHTML = sorted.map((event) => {
+            const avg = averageRating(event);
+            return `
+              <article class="history-item">
+                <div class="history-head">
+                  <b>${escapeHtml(event.fridayLabel || event.weekId)}</b>
+                  <span class="status-pill">${event.status === "done" ? "已完成" : "筹备中"}</span>
+                </div>
+                <p class="small muted">负责人：${escapeHtml(event.organizer || "未抽取")} · 主题：${escapeHtml(event.title || "待填写")}</p>
+                <p class="small muted">评分：${avg ? `${avg.toFixed(1)} / 5` : "暂无"} · 照片：${event.photos?.length || 0} 张 · 反馈：${event.ratings?.length || 0} 条</p>
+              </article>
+            `;
+          }).join("");
+        }
+
+        function renderIdeas() {
+          if (!state.ideas?.length) {
+            els.ideaList.innerHTML = `<div class="empty-state">灵感池还是空的，先丢一个想法进去。</div>`;
+            return;
+          }
+          els.ideaList.innerHTML = state.ideas.map((idea) => `
+            <div class="idea-item">
+              <div class="idea-head">
+                <b>${escapeHtml(idea.title)}</b>
+                <span class="status-pill ${idea.used ? "good" : ""}">${idea.used ? "已采用" : "待选择"}</span>
+              </div>
+              <p class="small muted">${escapeHtml(idea.detail || "没有补充说明")}</p>
+              <div class="actions">
+                <button class="ghost-button" type="button" data-toggle-idea="${idea.id}">${idea.used ? "标记未采用" : "标记采用"}</button>
+                <button class="ghost-button" type="button" data-delete-idea="${idea.id}">删除</button>
+              </div>
+            </div>
+          `).join("");
+        }
+
+        function renderStats() {
+          const totalEvents = state.events.filter((event) => event.organizer).length;
+          const doneEvents = state.events.filter((event) => event.status === "done").length;
+          const allRatings = state.events.flatMap((event) => event.ratings || []);
+          const avg = allRatings.length
+            ? allRatings.reduce((sum, rating) => sum + rating.score, 0) / allRatings.length
+            : 0;
+          els.heroStats.innerHTML = [
+            ["活动", `${totalEvents}`, "已抽签期数"],
+            ["完成", `${doneEvents}`, "已归档活动"],
+            ["评分", avg ? avg.toFixed(1) : "-", "整体平均分"]
+          ].map(([label, value, desc]) => `<div class="stat-mini"><b>${value}</b><span>${label} · ${desc}</span></div>`).join("");
+        }
+
+        function renderStorageInfo() {
+          const bytes = new Blob([JSON.stringify(state)]).size;
+          els.storageInfo.textContent = `当前本地数据约 ${(bytes / 1024).toFixed(1)} KB。照片会明显增加体积，云端版会改用对象存储。`;
+        }
+
+        function drawCurrentWeek(force = false) {
+          const event = currentWeek();
+          if (event.organizer && !force) return;
+          drawing = true;
+          els.drawButton.disabled = true;
+          els.rerollButton.disabled = true;
+          els.drawZone.classList.add("is-drawing");
+          els.rollingName.classList.remove("waiting");
+          els.statusLabel.textContent = "正在抽取";
+          els.subline.textContent = force ? "正在为本周补抽" : "新的周五负责人即将揭晓";
           let steps = 0;
-          const maxSteps = 24;
-          let delay = 58;
+          const maxSteps = reducedMotion ? 1 : 24;
+          let delay = reducedMotion ? 80 : 58;
 
           function roll() {
-            rollingName.classList.add("swap");
+            els.rollingName.classList.add("swap");
             window.setTimeout(() => {
-              rollingName.textContent = names[steps % names.length];
-              rollingName.classList.remove("swap");
+              els.rollingName.textContent = people[steps % people.length];
+              els.rollingName.classList.remove("swap");
               steps += 1;
               if (steps >= maxSteps) {
-                window.setTimeout(finalizeDraw, 230);
+                window.setTimeout(() => {
+                  event.organizer = chooseOrganizer(event);
+                  event.drawnAt = new Date().toISOString();
+                  event.status = event.status || "draft";
+                  drawing = false;
+                  persistQuietly();
+                  render();
+                  launchConfetti();
+                  showToast(`${event.organizer} 负责本周活动`);
+                }, 220);
               } else {
-                delay += Math.round(steps * 2.7);
+                delay += Math.round(steps * 2.6);
                 window.setTimeout(roll, delay);
               }
-            }, 75);
+            }, 70);
           }
 
           roll();
         }
 
-        function resetDraw() {
-          const confirmed = window.confirm("负责人不会改变，仅重新播放揭晓动画。继续吗？");
-          if (!confirmed) return;
-
-          clearStoredResult();
-          drawRoom.classList.remove("complete", "is-drawing");
-          rollingName.classList.add("waiting");
-          rollingName.textContent = "未揭晓";
-          statusLabel.textContent = "待抽取的负责人";
-          subline.textContent = "点击按钮，开启本周安排";
-          record.textContent = "签号已就绪 · 等待揭晓";
-          candidates.forEach((candidate) => candidate.classList.remove("selected"));
-          drawButton.disabled = false;
-          drawButton.textContent = "开始抽签";
-          resetButton.classList.remove("visible");
-        }
-
         function resizeCanvas() {
           const scale = window.devicePixelRatio || 1;
-          canvas.width = window.innerWidth * scale;
-          canvas.height = window.innerHeight * scale;
-          canvas.style.width = `${window.innerWidth}px`;
-          canvas.style.height = `${window.innerHeight}px`;
+          els.canvas.width = window.innerWidth * scale;
+          els.canvas.height = window.innerHeight * scale;
+          els.canvas.style.width = `${window.innerWidth}px`;
+          els.canvas.style.height = `${window.innerHeight}px`;
           context.setTransform(scale, 0, 0, scale, 0, 0);
         }
 
         function launchConfetti() {
+          if (reducedMotion) return;
           window.cancelAnimationFrame(confettiFrame);
           resizeCanvas();
           const colors = ["#e8c377", "#fff0c9", "#c68d3b", "#e7e4de", "#8793bd"];
-          const pieces = Array.from({ length: 92 }, (_, index) => {
+          const pieces = Array.from({ length: 90 }, (_, index) => {
             const direction = index % 2 === 0 ? -1 : 1;
             return {
               x: window.innerWidth / 2 + direction * (16 + Math.random() * 50),
-              y: window.innerHeight * 0.39,
+              y: window.innerHeight * 0.36,
               vx: direction * (1.8 + Math.random() * 5.6),
               vy: -(2.5 + Math.random() * 7),
               gravity: 0.11 + Math.random() * 0.06,
@@ -754,7 +1512,7 @@
           });
           let frame = 0;
 
-          function render() {
+          function renderPieces() {
             context.clearRect(0, 0, window.innerWidth, window.innerHeight);
             pieces.forEach((piece) => {
               piece.x += piece.vx;
@@ -772,19 +1530,195 @@
             });
             frame += 1;
             if (frame < 126) {
-              confettiFrame = window.requestAnimationFrame(render);
+              confettiFrame = window.requestAnimationFrame(renderPieces);
             } else {
               context.clearRect(0, 0, window.innerWidth, window.innerHeight);
             }
           }
 
-          render();
+          renderPieces();
         }
 
-        drawButton.addEventListener("click", startDraw);
-        resetButton.addEventListener("click", resetDraw);
-        window.addEventListener("resize", resizeCanvas);
-        loadStoredResult();
+        function escapeHtml(value) {
+          return String(value ?? "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+        }
+
+        function bindEvents() {
+          document.querySelectorAll(".tab-button").forEach((button) => {
+            button.addEventListener("click", () => {
+              document.querySelectorAll(".tab-button").forEach((tab) => tab.classList.remove("active"));
+              document.querySelectorAll(".section").forEach((section) => section.classList.remove("active"));
+              button.classList.add("active");
+              document.getElementById(button.dataset.tab).classList.add("active");
+            });
+          });
+
+          els.drawButton.addEventListener("click", () => drawCurrentWeek(false));
+          els.rerollButton.addEventListener("click", () => {
+            if (drawing) return;
+            const ok = window.confirm("确定要为本周补抽吗？当前负责人会被替换。");
+            if (ok) drawCurrentWeek(true);
+          });
+
+          els.activityForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const current = currentWeek();
+            Object.assign(current, {
+              title: els.titleInput.value.trim(),
+              time: els.timeInput.value.trim(),
+              location: els.locationInput.value.trim(),
+              budget: els.budgetInput.value.trim(),
+              plan: els.planInput.value.trim(),
+              summary: els.summaryInput.value.trim()
+            });
+            saveState();
+            showToast("活动档案已保存");
+          });
+
+          els.completeButton.addEventListener("click", () => {
+            const current = currentWeek();
+            current.status = current.status === "done" ? "draft" : "done";
+            saveState();
+            showToast(current.status === "done" ? "已标记完成" : "已改回筹备中");
+          });
+
+          els.photoInput.addEventListener("change", async () => {
+            const current = currentWeek();
+            const files = Array.from(els.photoInput.files || []);
+            for (const file of files) {
+              if (!file.type.startsWith("image/")) continue;
+              if (file.size > 700 * 1024) {
+                showToast(`${file.name} 超过 700KB，暂未保存`);
+                continue;
+              }
+              const dataUrl = await readFileAsDataUrl(file);
+              current.photos = current.photos || [];
+              current.photos.unshift({
+                id: cryptoId(),
+                name: file.name,
+                dataUrl,
+                createdAt: new Date().toISOString()
+              });
+            }
+            els.photoInput.value = "";
+            saveState();
+            showToast("照片已保存到本地");
+          });
+
+          els.gallery.addEventListener("click", (event) => {
+            const id = event.target.dataset.deletePhoto;
+            if (!id) return;
+            const current = currentWeek();
+            current.photos = (current.photos || []).filter((photo) => photo.id !== id);
+            saveState();
+          });
+
+          els.starInput.addEventListener("click", (event) => {
+            const score = Number(event.target.dataset.score);
+            if (!score) return;
+            activeRating = score;
+            renderStars(activeRating);
+          });
+
+          els.ratingForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const current = currentWeek();
+            const name = els.raterInput.value;
+            current.ratings = current.ratings || [];
+            const existing = current.ratings.find((rating) => rating.name === name);
+            const payload = {
+              name,
+              score: activeRating,
+              comment: els.commentInput.value.trim(),
+              createdAt: new Date().toISOString()
+            };
+            if (existing) Object.assign(existing, payload);
+            else current.ratings.push(payload);
+            els.commentInput.value = "";
+            saveState();
+            showToast("评分已提交");
+          });
+
+          els.newWeekButton.addEventListener("click", () => {
+            state.weekOffset = (state.weekOffset || 0) + 1;
+            saveState();
+            showToast("已切换到下一周测试");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+
+          els.ideaForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const title = els.ideaTitleInput.value.trim();
+            if (!title) {
+              showToast("先写一个想法标题");
+              return;
+            }
+            state.ideas.unshift({
+              id: cryptoId(),
+              title,
+              author: els.ideaAuthorInput.value,
+              detail: els.ideaDetailInput.value.trim(),
+              used: false,
+              createdAt: new Date().toISOString()
+            });
+            els.ideaTitleInput.value = "";
+            els.ideaDetailInput.value = "";
+            saveState();
+            showToast("灵感已加入");
+          });
+
+          els.ideaList.addEventListener("click", (event) => {
+            const toggleId = event.target.dataset.toggleIdea;
+            const deleteId = event.target.dataset.deleteIdea;
+            if (toggleId) {
+              const idea = state.ideas.find((item) => item.id === toggleId);
+              if (idea) idea.used = !idea.used;
+              saveState();
+            }
+            if (deleteId) {
+              state.ideas = state.ideas.filter((idea) => idea.id !== deleteId);
+              saveState();
+            }
+          });
+
+          els.exportButton.addEventListener("click", async () => {
+            const text = JSON.stringify(state, null, 2);
+            try {
+              await navigator.clipboard.writeText(text);
+              showToast("数据已复制到剪贴板");
+            } catch (error) {
+              showToast("浏览器不允许复制，请稍后接云端导出");
+            }
+          });
+
+          els.clearButton.addEventListener("click", () => {
+            const ok = window.confirm("确定清空当前浏览器里的活动数据吗？线上页面不会被删除。");
+            if (!ok) return;
+            localStorage.removeItem(storageKey);
+            state = emptyState();
+            saveState();
+            showToast("本地数据已重置");
+          });
+
+          window.addEventListener("resize", resizeCanvas);
+        }
+
+        function readFileAsDataUrl(file) {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+        }
+
+        bindEvents();
+        render();
       })();
     </script>
   </body>
